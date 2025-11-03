@@ -1,0 +1,25 @@
+.pipe {
+  position: absolute;
+  z-index: 90;
+  pointer-events: none; /* Don't block player movement */
+  width: 86px; /* Use game's internal coordinate system */
+  height: 86px;
+}
+
+.pipe-image {
+  position: absolute;
+  width: 100%; /* Scale with container */
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.pipe-image--body {
+  z-index: 90;
+}
+
+.pipe-image--lip {
+  z-index: 110;
+  clip-path: inset(0 0 60px 0);
+}

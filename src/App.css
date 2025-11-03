@@ -1,0 +1,246 @@
+.app {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.instructions {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: white;
+  font-size: 12px;
+  text-shadow: 2px 2px 0px #000;
+  z-index: 10;
+  line-height: 1.8;
+}
+
+.instructions p {
+  margin: 5px 0;
+}
+
+/* Welcome Dialog */
+.welcome-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.welcome-scene {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.welcome-character {
+  flex-shrink: 0;
+  animation: bounce 1s ease-in-out infinite;
+}
+
+.character-sprite {
+  width: 250px; /* Increased from 150px */
+  height: auto;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.3));
+}
+
+.speech-balloon {
+  position: relative;
+  background: #fff;
+  border: 6px solid #000;
+  border-radius: 30px;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.5);
+  padding: 30px 40px;
+  max-width: 500px;
+  text-align: center;
+}
+
+/* Speech balloon tail - points to the right (towards character) */
+.speech-balloon::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -30px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 25px 0 25px 30px;
+  border-color: transparent transparent transparent #000;
+}
+
+.speech-balloon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -24px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 20px 0 20px 24px;
+  border-color: transparent transparent transparent #fff;
+}
+
+.speech-balloon h1 {
+  font-size: 42px;
+  margin: 0 0 20px 0;
+  color: #000;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.speech-balloon p {
+  font-size: 22px;
+  margin: 0 0 30px 0;
+  color: #333;
+  font-weight: bold;
+}
+
+.start-button {
+  font-size: 18px;
+  color: #fff;
+  font-weight: bold;
+  padding: 16px 40px;
+  background: #ff6b6b;
+  border: 4px solid #000;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Press Start 2P', monospace;
+  transition: all 0.15s;
+  box-shadow: 4px 4px 0 #000;
+  text-transform: uppercase;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.start-button:hover {
+  background: #ff5252;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #000;
+}
+
+.start-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #000;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Responsive styles for welcome dialog */
+@media (max-width: 768px) {
+  .welcome-scene {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .speech-balloon {
+    padding: 30px 40px;
+    max-width: 90vw;
+  }
+  
+  .speech-balloon h1 {
+    font-size: 36px;
+  }
+  
+  .speech-balloon p {
+    font-size: 20px;
+  }
+  
+  .character-sprite {
+    width: 200px;
+  }
+  
+  .start-button {
+    font-size: 14px;
+    padding: 12px 30px;
+  }
+  
+  /* Hide speech balloon tail on mobile */
+  .speech-balloon::before,
+  .speech-balloon::after {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-scene {
+    gap: 15px;
+    padding: 15px;
+  }
+  
+  .speech-balloon {
+    padding: 20px 25px;
+    border-width: 4px;
+  }
+  
+  .speech-balloon h1 {
+    font-size: 28px;
+    margin: 0 0 15px 0;
+  }
+  
+  .speech-balloon p {
+    font-size: 16px;
+    margin: 0 0 20px 0;
+  }
+  
+  .character-sprite {
+    width: 150px;
+  }
+  
+  .start-button {
+    font-size: 12px;
+    padding: 10px 24px;
+    border-width: 3px;
+  }
+}

@@ -1,0 +1,297 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: #fff;
+  border: 4px solid #000;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
+  max-width: 900px;
+  width: 85%;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Wider modal for Experience section */
+.modal-content.experience-modal {
+  max-width: 1100px;
+  width: 90%;
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0.5) translateY(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  background: #ffd700;
+  border-bottom: 4px solid #000;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 32px;
+  text-transform: uppercase;
+  color: #000;
+  font-weight: bold;
+}
+
+.close-button {
+  background: #ff0000;
+  border: 3px solid #000;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  font-family: 'Press Start 2P', monospace;
+  transition: all 0.1s;
+  box-shadow: inset -2px -2px 0 #aa0000;
+}
+
+.close-button:hover {
+  background: #cc0000;
+  transform: scale(1.1);
+}
+
+.close-button:active {
+  box-shadow: inset 2px 2px 0 #aa0000;
+}
+
+.modal-body {
+  padding: 40px;
+  background: #f0f0f0;
+}
+
+.modal-description {
+  font-size: 18px;
+  line-height: 2;
+  margin-bottom: 25px;
+  color: #333;
+  font-weight: bold;
+}
+
+.modal-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.modal-list li {
+  background: #fff;
+  border: 2px solid #000;
+  padding: 18px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  line-height: 1.8;
+  position: relative;
+  padding-left: 45px;
+  font-weight: bold;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Reduce padding for experience items since no large star */
+.modal-list li.experience-item {
+  padding-left: 18px;
+}
+
+.modal-list li span {
+  display: block;
+  margin-bottom: 8px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+.modal-list li span:last-child {
+  margin-bottom: 0;
+}
+
+.modal-list li div {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+.modal-list li::before {
+  content: '★';
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: #ffd700;
+}
+
+/* Hide the large star for experience items */
+.modal-list li.experience-item::before {
+  content: none;
+}
+
+.modal-footer {
+  background: #333;
+  padding: 15px;
+  text-align: center;
+  border-top: 4px solid #000;
+}
+
+.hint {
+  margin: 0;
+  font-size: 16px;
+  color: #fff;
+  opacity: 0.7;
+}
+
+/* Scrollbar styling */
+.modal-content::-webkit-scrollbar {
+  width: 12px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: #333;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #ffd700;
+  border: 2px solid #000;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: #ffed4e;
+}
+
+/* Bullet point stars */
+.bullet-star {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  background-image: url('/rainbow star.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  image-rendering: pixelated;
+}
+
+/* Project items */
+.modal-list li.project-item {
+  padding-left: 18px;
+}
+
+.modal-list li.project-item::before {
+  content: none;
+}
+
+.github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #fff;
+  border: 3px solid #000;
+  text-decoration: none;
+  color: #000;
+  font-weight: bold;
+  font-size: 14px;
+  transition: all 0.15s;
+  box-shadow: 3px 3px 0 #000;
+  cursor: pointer;
+}
+
+.github-link:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 #000;
+  background: #ffd700;
+}
+
+.github-link:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
+}
+
+.github-link i {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* Contact buttons */
+.contact-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  padding: 10px;
+}
+
+.contact-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #fff;
+  border: 4px solid #000;
+  text-decoration: none;
+  color: #000;
+  font-weight: bold;
+  transition: all 0.15s;
+  box-shadow: 4px 4px 0 #000;
+  cursor: pointer;
+  min-height: 140px;
+}
+
+.contact-button:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #000;
+  background: #ffd700;
+}
+
+.contact-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #000;
+}
+
+.contact-icon {
+  font-size: 64px;
+  margin-bottom: 12px;
+  line-height: 1;
+}
+
+.contact-label {
+  font-size: 16px;
+  text-align: center;
+  text-transform: uppercase;
+}

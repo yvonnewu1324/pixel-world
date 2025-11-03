@@ -1,0 +1,118 @@
+/* ==== Pixel-art essentials ==== */
+.player {
+  position: absolute;
+  width: 416px;  /* Frame width from walk/jump sprites */
+  height: 624px; /* Frame height from walk/jump sprites */
+  overflow: hidden;
+  z-index: 50;
+  /* Fixed scale - canvas scales responsively */
+  transform: scale(0.3);
+  transform-origin: top left;
+}
+
+/* Flip horizontally (face left) */
+.player.face-left .sprite {
+  transform: scaleX(-1);
+}
+
+.sprite {
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  image-rendering: pixelated; /* Ensures sharp, non-blurry pixels */
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+
+.hero--idle {
+  background-image: url("/idle2.png");
+  /* Scaled to match walk/jump size 457.6px 686.4px*/
+  background-size: 457.6px 686.4px;
+  background-position: 0 0;
+}
+
+/* Walk Animation: 4 frames in 2x2 grid (832x1248, each frame 416x624) */
+.hero--walk {
+  background-image: url("/walk4.png");
+  background-size: 832px 1248px;
+  background-position: 0 0;
+  animation: walk-animation 0.6s steps(1) infinite;
+}
+
+@keyframes walk-animation {
+  0% {
+    background-position: 0 0;
+    margin-top: 0;
+  }
+  50% {
+    background-position: 0 -600px; /* Bottom-left frame */
+    margin-top: 54px; /* Adjust this value to push frame down visually */
+  }
+  100% {
+    background-position: 0 0;
+    margin-top: 0;
+  }
+}
+
+/* Jump Animation: Single static frame from 2x2 grid (832x1248, each frame 416x624) */
+.hero--jump {
+  background-image: url("/jump.png");
+  background-size: 873.6px 1310.4px; /* 1.05x larger: 832*1.05 x 1248*1.05 */
+  background-position: -436.8px 0; /* Top-right frame scaled (416*1.05) */
+}
+
+/* Squat Animation: Single static frame */
+.hero--squat {
+  background-image: url("/squat.png");
+  background-size: 457.6px 686.4px;
+  background-position: 0 0;
+}
+
+/* Pipe Animation: Slide down into pipe */
+.player--entering-pipe {
+  animation: slide-into-pipe 1s ease-in forwards;
+}
+
+@keyframes slide-into-pipe {
+  0% {
+    transform: scale(0.3) translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.3) translateY(400px);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(0.3) translateY(800px); /* Slide down further into pipe */
+    opacity: 0;
+  }
+}
+
+/* Pipe Animation: Slide up out of pipe */
+.player--exiting-pipe {
+  animation: slide-out-of-pipe 1s ease-out forwards;
+}
+
+.player--transitioning {
+  opacity: 0;
+}
+
+.player--in-pipe {
+  z-index: 40;
+}
+
+@keyframes slide-out-of-pipe {
+  0% {
+    transform: scale(0.3) translateY(800px); /* Start from deep inside pipe */
+    opacity: 0;
+  }
+  50% {
+    transform: scale(0.3) translateY(400px);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(0.3) translateY(0); /* End at pipe top */
+    opacity: 1;
+  }
+}
