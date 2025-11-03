@@ -19,6 +19,10 @@
   -ms-user-select: none;
 }
 
+.brick:not(.hit) {
+  animation: float 2s ease-in-out infinite;
+}
+
 .brick::before {
   content: '';
   position: absolute;
@@ -53,7 +57,6 @@
   color: #fff;
   text-shadow: 3px 3px 0 #000;
   z-index: 1;
-  animation: float 2s ease-in-out infinite;
 }
 
 .brick.hit .question-mark {
@@ -61,11 +64,14 @@
 }
 
 .brick.hit {
-  animation: brickHit 0.3s ease-out;
   box-shadow:
     inset -3px -3px 0 #6b5537,
     inset 3px 3px 0 #a8896a,
     0 2px 0 #000;
+}
+
+.brick.hit-just {
+  animation: brickHit 0.3s ease-out;
 }
 
 @keyframes brickHit {
@@ -85,7 +91,7 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-4px);
+    transform: translateY(-8px);
   }
 }
 

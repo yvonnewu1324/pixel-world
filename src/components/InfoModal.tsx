@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { memo, useEffect } from 'react'
 import { Brick } from '../types'
 import './InfoModal.css'
 
@@ -160,4 +160,4 @@ function InfoModal({ brick, onClose }: InfoModalProps) {
   )
 }
 
-export default InfoModal
+export default memo(InfoModal)

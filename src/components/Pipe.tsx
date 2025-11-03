@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import './Pipe.css'
 
 interface PipeProps {
@@ -20,4 +21,4 @@ function Pipe({ position, isUnderground = false }: PipeProps) {
   )
 }
 
-export default Pipe
+export default memo(Pipe)

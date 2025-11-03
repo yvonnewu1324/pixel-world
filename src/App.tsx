@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import './App.css'
 import GameCanvas from './components/GameCanvas'
 import InfoModal from './components/InfoModal'
@@ -55,6 +55,9 @@ const PIPE_SQUAT_DURATION = 220
 const PIPE_ENTER_DURATION = 1000
 const PIPE_EXIT_DURATION = 1000
 const PIPE_TRANSITION_BUFFER = 160
+
+// Game keys array - defined outside component to prevent recreation
+const GAME_KEYS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'a', 'A', 'd', 'D', 'w', 'W', 's', 'S', ' ']
 
 // Pipe helpers
 const PIPE_BOX = {
@@ -185,8 +188,8 @@ const initialBricks: Brick[] = [
       description: 'My technical expertise',
       items: [
         'Languages: Golang, Python, JavaScript, C++, SQL',
-        'Frameworks: Gin, Fx, Express, PyTorch, TensorFlow',
-        'Frontend: Nuxt.js, Next.js',
+        'Frameworks: Gin, Fx, Express.js, PyTorch, TensorFlow',
+        'Frontend:Vue.js, React.js, Nuxt.js, Next.js',
         'Databases: MySQL, MongoDB',
         'Tools: Git, Docker, Kubernetes, Grafana, Drone CI',
         'Strong knowledge in ML, Algorithms, Web Dev'
@@ -213,6 +216,9 @@ const initialBricks: Brick[] = [
 
 function App() {
   const [bricks, setBricks] = useState<Brick[]>(initialBricks)
+  const bricksRef = useRef<Brick[]>(initialBricks) // Ref for game loop to avoid dependency
+  // Track which bricks have been hit (persists across world switches)
+  const hitBricksRef = useRef<Set<string>>(new Set())
   const [player, setPlayer] = useState<Player>({
     position: { x: 50, y: PLAYER_GROUND_Y },  // Start at ground level
     velocity: { x: 0, y: 0 },
@@ -231,6 +237,19 @@ function App() {
   const pipeStateRef = useRef(pipeState)
   const stageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const handledPhaseRef = useRef<PipePhase>('idle')
+  
+  // Helper function to apply hit state to bricks
+  const applyHitState = useCallback((brickArray: Brick[]): Brick[] => {
+    return brickArray.map(brick => ({
+      ...brick,
+      hit: hitBricksRef.current.has(brick.id)
+    }))
+  }, [])
+  
+  // Keep bricksRef in sync with bricks state
+  useEffect(() => {
+    bricksRef.current = bricks
+  }, [bricks])
 
   const updatePipeState = useCallback((next: PipeState | ((prev: PipeState) => PipeState)) => {
     setPipeState(prev => {
@@ -327,7 +346,10 @@ function App() {
           updatePipeState({ phase: 'idle', targetIsUnderground: null })
           return
         }
-        setBricks(pipeState.targetIsUnderground ? undergroundBricks : initialBricks)
+        // Switch bricks but preserve hit state
+        const newBricks = pipeState.targetIsUnderground ? undergroundBricks : initialBricks
+        const bricksWithHitState = applyHitState(newBricks)
+        setBricks(bricksWithHitState)
         setPlayer(prev => ({
           ...prev,
           position: { x: getPipeCenterX(prev.direction), y: PIPE_TOP_Y },
@@ -380,8 +402,7 @@ function App() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Prevent default browser behavior for game keys (only when game started)
-      const gameKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'a', 'A', 'd', 'D', 'w', 'W', 's', 'S', ' ']
-      if (gameKeys.includes(e.key) && gameStarted) {
+      if (GAME_KEYS.includes(e.key) && gameStarted) {
         e.preventDefault()
       }
       
@@ -395,8 +416,7 @@ function App() {
 
     const handleKeyUp = (e: KeyboardEvent) => {
       // Prevent default browser behavior for game keys (only when game started)
-      const gameKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'a', 'A', 'd', 'D', 'w', 'W', 's', 'S', ' ']
-      if (gameKeys.includes(e.key) && gameStarted) {
+      if (GAME_KEYS.includes(e.key) && gameStarted) {
         e.preventDefault()
       }
       
@@ -418,11 +438,20 @@ function App() {
     }
   }, [gameStarted])
 
-  // Game loop
+  // Game loop - use requestAnimationFrame for better performance
   useEffect(() => {
     if (!gameStarted) return // Don't run game loop until game starts
 
-    const gameLoop = setInterval(() => {
+    let animationFrameId: number
+    let lastTime = performance.now()
+    const targetFPS = 60
+    const frameInterval = 1000 / targetFPS
+
+    const gameLoop = (currentTime: number) => {
+      const deltaTime = currentTime - lastTime
+      
+      if (deltaTime >= frameInterval) {
+        lastTime = currentTime - (deltaTime % frameInterval)
       setPlayer(prevPlayer => {
         let newVelocity = { ...prevPlayer.velocity }
         let newPosition = { ...prevPlayer.position }
@@ -564,8 +593,8 @@ function App() {
           }
         }
 
-        // Brick collision detection
-        bricks.forEach(brick => {
+        // Brick collision detection - use ref to avoid dependency
+        bricksRef.current.forEach(brick => {
           const brickTop = brick.position.y
           const brickBottom = brick.position.y + BRICK_SIZE
           const brickLeft = brick.position.x
@@ -596,11 +625,16 @@ function App() {
 
             // Hit from below (trigger brick)
             if (minOverlap === overlapBottom && newVelocity.y < 0 && playerCenterX > brickLeft && playerCenterX < brickRight) {
-              setBricks(prevBricks =>
-                prevBricks.map(b =>
+              // Mark brick as hit in the persistent set
+              hitBricksRef.current.add(brick.id)
+              // Update state outside of setPlayer callback for better performance
+              setBricks(prevBricks => {
+                const updated = prevBricks.map(b =>
                   b.id === brick.id ? { ...b, hit: true } : b
                 )
-              )
+                bricksRef.current = updated
+                return updated
+              })
               setSelectedBrick(brick)
               newVelocity.y = 0
               newPosition.y = brickBottom
@@ -634,10 +668,19 @@ function App() {
           pipeAnimation: prevPlayer.pipeAnimation
         }
       })
-    }, 1000 / 60) // 60 FPS
+      }
+      
+      animationFrameId = requestAnimationFrame(gameLoop)
+    }
 
-    return () => clearInterval(gameLoop)
-  }, [bricks, selectedBrick, gameStarted, triggerPipeTravel])
+    animationFrameId = requestAnimationFrame(gameLoop)
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+      }
+    }
+  }, [selectedBrick, gameStarted, triggerPipeTravel]) // Removed bricks from deps - using ref instead
 
   const closeModal = useCallback(() => {
     setSelectedBrick(null)
@@ -651,9 +694,12 @@ function App() {
     keysRef.current = new Set()
   }, [])
 
+  // Memoize pipe position to prevent recreation on every render
+  const pipePosition = useMemo(() => ({ x: PIPE_X, y: PIPE_Y }), [])
+
   return (
     <>
-      {gameStarted && <GameCanvas player={player} bricks={bricks} pipePosition={{ x: PIPE_X, y: PIPE_Y }} />}
+      {gameStarted && <GameCanvas player={player} bricks={bricks} pipePosition={pipePosition} />}
       {selectedBrick && (
         <InfoModal brick={selectedBrick} onClose={closeModal} />
       )}

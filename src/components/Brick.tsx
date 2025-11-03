@@ -1,3 +1,4 @@
+import { memo, useEffect, useRef } from 'react'
 import { Brick } from '../types'
 import './Brick.css'
 import KeyboardIcon from './KeyboardIcon'
@@ -8,9 +9,33 @@ interface BrickProps {
 }
 
 function BrickComponent({ brick }: BrickProps) {
+  const wasHitRef = useRef(false)
+  const shouldAnimateRef = useRef(false)
+  
+  // Track if brick was just hit (transitions from false to true)
+  useEffect(() => {
+    if (brick.hit && !wasHitRef.current) {
+      // Brick was just hit - trigger animation
+      shouldAnimateRef.current = true
+      wasHitRef.current = true
+      // Reset animation flag after animation completes
+      const timer = setTimeout(() => {
+        shouldAnimateRef.current = false
+      }, 300) // Match animation duration
+      return () => clearTimeout(timer)
+    } else if (brick.hit && wasHitRef.current) {
+      // Brick was already hit - no animation
+      shouldAnimateRef.current = false
+    } else if (!brick.hit) {
+      // Brick is not hit - reset state
+      wasHitRef.current = false
+      shouldAnimateRef.current = false
+    }
+  }, [brick.hit])
+  
   return (
     <div
-      className={`brick ${brick.hit ? 'hit' : ''} brick-${brick.type}`}
+      className={`brick ${brick.hit ? 'hit' : ''} ${shouldAnimateRef.current ? 'hit-just' : ''} brick-${brick.type}`}
       style={{
         left: `${brick.position.x}px`,
         top: `${brick.position.y}px`,
@@ -31,4 +56,4 @@ function BrickComponent({ brick }: BrickProps) {
   )
 }
 
-export default BrickComponent
+export default memo(BrickComponent)

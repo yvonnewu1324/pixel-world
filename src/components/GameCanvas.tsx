@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { memo, useEffect, useRef } from 'react'
 import { Player, Brick } from '../types'
 import BrickComponent from './Brick'
 import PlayerComponent from './Player'
@@ -63,4 +63,4 @@ function GameCanvas({ player, bricks, pipePosition }: GameCanvasProps) {
   )
 }
 
-export default GameCanvas
+export default memo(GameCanvas)

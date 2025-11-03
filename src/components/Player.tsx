@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Player } from '../types'
 import './Player.css'
 
@@ -47,4 +48,4 @@ function PlayerComponent({ player }: PlayerProps) {
   )
 }
 
-export default PlayerComponent
+export default memo(PlayerComponent)
