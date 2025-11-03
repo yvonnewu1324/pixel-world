@@ -32,7 +32,7 @@ const BRICK_Y = GROUND_Y - (PLAYER_HEIGHT * 1.2) - BRICK_SIZE
 // Calculate brick positions evenly distributed across the game width
 const NUM_BRICKS = 5
 const LEFT_MARGIN = 100  //  left margin
-const RIGHT_MARGIN = 200  // Margin on right side
+const RIGHT_MARGIN = 250  // Margin on right side
 const AVAILABLE_WIDTH = GAME_WIDTH - LEFT_MARGIN - RIGHT_MARGIN  // 1400 - 0 - 200 = 1200px
 const TOTAL_BRICK_WIDTH = NUM_BRICKS * BRICK_SIZE  // 5 * 80 = 400px
 const TOTAL_GAP_WIDTH = AVAILABLE_WIDTH - TOTAL_BRICK_WIDTH  // 1200 - 400 = 800px
