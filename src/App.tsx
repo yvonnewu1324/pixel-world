@@ -157,6 +157,7 @@ const initialBricks: Brick[] = [
       title: 'Experience',
       description: 'My professional journey',
       items: [
+        'Research Assistant at University of California, Davis||Apr. 2024 - Dec. 2024\nWorking with Prof. Anshuman Chhabra and Prof. Magdalena Wojcieszak on Generative AI to analyze polarization in political unstructured natural language\nUtilizing Python and OpenAI API to fine-tune GPT-3.5 models',
         'Software Engineering Intern at LINE TAIWAN LIMITED||Sept. 2021 - June 2023\nDesigned and implemented web deployment automation internal CMS using Golang and MySQL; reducing hardcoded processes and shortening deployment time by 70%\nEngineered mobile subscription APIs with Kafka; supporting over 10K users daily\nDeveloped comprehensive Grafana dashboards for real-time monitoring and event logging\nCreated a Golang automation bot with Kubernetes CronJob that retrieved Trello tasks and generated weekly reports for 5 Scrum teams',
         'Backend Intern at Aptan||Mar. 2021 - Aug. 2021\nIntroduced GraphQL APIs to optimize nested data queries and reduce frontend complexity\nImplemented modular Golang APIs with GORM for user data management; cutting backend development time by 28% and simplifying future feature integration',
         'Software Intern at WeGrains||June 2020 - Dec. 2020\nParticipated in an IoT parking system development; project recognized by Taiwan\'s National Development Fund\nDesigned and implemented MySQL schema and RESTful APIs for parking management system with Node.js and Express.js'
@@ -189,7 +190,7 @@ const initialBricks: Brick[] = [
       items: [
         'Languages: Golang, Python, JavaScript, C++, SQL',
         'Frameworks: Gin, Fx, Express.js, PyTorch, TensorFlow',
-        'Frontend:Vue.js, React.js, Nuxt.js, Next.js',
+        'Frontend: Vue.js, React.js, Nuxt.js, Next.js',
         'Databases: MySQL, MongoDB',
         'Tools: Git, Docker, Kubernetes, Grafana, Drone CI',
         'Strong knowledge in ML, Algorithms, Web Dev'
