@@ -41,6 +41,7 @@
   animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
+
 .welcome-character {
   flex-shrink: 0;
   animation: bounce 1s ease-in-out infinite;
@@ -175,72 +176,3 @@
   }
 }
 
-/* Responsive styles for welcome dialog */
-@media (max-width: 768px) {
-  .welcome-scene {
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    padding: 20px;
-  }
-  
-  .speech-balloon {
-    padding: 30px 40px;
-    max-width: 90vw;
-  }
-  
-  .speech-balloon h1 {
-    font-size: 36px;
-  }
-  
-  .speech-balloon p {
-    font-size: 20px;
-  }
-  
-  .character-sprite {
-    width: 200px;
-  }
-  
-  .start-button {
-    font-size: 14px;
-    padding: 12px 30px;
-  }
-  
-  /* Hide speech balloon tail on mobile */
-  .speech-balloon::before,
-  .speech-balloon::after {
-    display: none;
-  }
-}
-
-@media (max-width: 480px) {
-  .welcome-scene {
-    gap: 15px;
-    padding: 15px;
-  }
-  
-  .speech-balloon {
-    padding: 20px 25px;
-    border-width: 4px;
-  }
-  
-  .speech-balloon h1 {
-    font-size: 28px;
-    margin: 0 0 15px 0;
-  }
-  
-  .speech-balloon p {
-    font-size: 16px;
-    margin: 0 0 20px 0;
-  }
-  
-  .character-sprite {
-    width: 150px;
-  }
-  
-  .start-button {
-    font-size: 12px;
-    padding: 10px 24px;
-    border-width: 3px;
-  }
-}

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import './App.css'
 import GameCanvas from './components/GameCanvas'
 import InfoModal from './components/InfoModal'
+import MobileMessage from './components/MobileMessage'
 import { Brick, Player } from './types'
 
 // Game canvas dimensions (fixed internal coordinates)
@@ -700,6 +701,7 @@ function App() {
 
   return (
     <>
+      <MobileMessage />
       {gameStarted && <GameCanvas player={player} bricks={bricks} pipePosition={pipePosition} />}
       {selectedBrick && (
         <InfoModal brick={selectedBrick} onClose={closeModal} />
