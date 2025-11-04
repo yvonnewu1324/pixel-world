@@ -6,6 +6,7 @@ import MobileMessage from './components/MobileMessage'
 import VirtualControls from './components/VirtualControls'
 import { Brick, Player } from './types'
 import { useMobilePortrait } from './hooks/useMobilePortrait'
+import { PlayerPhysics, GameConstants as PhysicsGameConstants } from './game/PlayerPhysics'
 
 // Desktop game canvas dimensions (fixed internal coordinates)
 const DESKTOP_GAME_WIDTH = 1400
@@ -395,12 +396,15 @@ function App() {
   const [keys, setKeys] = useState<Set<string>>(new Set())
   const keysRef = useRef<Set<string>>(new Set())
   const [selectedBrick, setSelectedBrick] = useState<Brick | null>(null)
+  const selectedBrickRef = useRef<Brick | null>(null)
   const [showWelcome, setShowWelcome] = useState(true)
   const [gameStarted, setGameStarted] = useState(false)
   const [pipeState, setPipeState] = useState<PipeState>({ phase: 'idle', targetIsUnderground: null })
   const pipeStateRef = useRef(pipeState)
   const stageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const handledPhaseRef = useRef<PipePhase>('idle')
+  const physicsEngineRef = useRef<PlayerPhysics | null>(null)
+  const playerRef = useRef<Player>(player)
   
   // Helper function to apply hit state to bricks
   const applyHitState = useCallback((brickArray: Brick[]): Brick[] => {
@@ -431,6 +435,16 @@ function App() {
   useEffect(() => {
     bricksRef.current = bricks
   }, [bricks])
+
+  // Keep selectedBrickRef in sync with selectedBrick state
+  useEffect(() => {
+    selectedBrickRef.current = selectedBrick
+  }, [selectedBrick])
+
+  // Keep playerRef in sync with player state
+  useEffect(() => {
+    playerRef.current = player
+  }, [player])
 
   const updatePipeState = useCallback((next: PipeState | ((prev: PipeState) => PipeState)) => {
     setPipeState(prev => {
@@ -621,275 +635,94 @@ function App() {
     }
   }, [gameStarted])
 
-  // Game loop - use requestAnimationFrame for better performance
+  // Initialize and manage pure JavaScript physics engine
   useEffect(() => {
-    if (!gameStarted) return // Don't run game loop until game starts
-
-    let animationFrameId: number
-    let lastTime = performance.now()
-    const targetFPS = 60
-    const frameInterval = 1000 / targetFPS
-    
-    const gameLoop = (currentTime: number) => {
-      const deltaTime = currentTime - lastTime
-      
-      if (deltaTime >= frameInterval) {
-        lastTime = currentTime - (deltaTime % frameInterval)
-      setPlayer(prevPlayer => {
-        let newVelocity = { ...prevPlayer.velocity }
-        let newPosition = { ...prevPlayer.position }
-        let newDirection = prevPlayer.direction
-        let newIsJumping = prevPlayer.isJumping
-        let newIsSquatting = false
-        let newIsUnderground = prevPlayer.isUnderground
-
-        // Disable all physics and movement during pipe animations
-        if (prevPlayer.pipeAnimation !== 'none') {
-          // Keep squatting during priming phase for squat sprite
-          const animationSquatting = prevPlayer.pipeAnimation === 'priming'
-
-          return {
-            ...prevPlayer,
-            velocity: { x: 0, y: 0 },
-            position: { ...prevPlayer.position },
-            isSquatting: animationSquatting,
-            isJumping: false
-          }
-        }
-
-        // Disable movement when modal is open
-        if (selectedBrick) {
-          newVelocity.x = 0
-          newVelocity.y += 0.8 // Still apply gravity
-        } else {
-          // Horizontal movement - use ref to get latest key state
-          const currentKeys = keysRef.current
-          
-          // Check for squat first (takes priority over horizontal movement when on ground)
-          if ((currentKeys.has('ArrowDown') || currentKeys.has('s') || currentKeys.has('S')) && !prevPlayer.isJumping) {
-            newIsSquatting = true
-            newVelocity.x = 0 // Can't move while squatting
-          } else {
-            if (currentKeys.has('ArrowLeft') || currentKeys.has('a') || currentKeys.has('A')) {
-              newVelocity.x = -5
-              newDirection = 'left'
-            } else if (currentKeys.has('ArrowRight') || currentKeys.has('d') || currentKeys.has('D')) {
-              newVelocity.x = 5
-              newDirection = 'right'
-            } else {
-              newVelocity.x = 0
-            }
-          }
-
-          // Jump - use ref to get latest key state
-          // Lower jump height for mobile (smaller screen, less space)
-          const jumpVelocity = isMobilePortrait ? -17 : -18
-          if ((currentKeys.has('ArrowUp') || currentKeys.has('w') || currentKeys.has('W') || currentKeys.has(' ')) && !prevPlayer.isJumping) {
-            newVelocity.y = jumpVelocity
-            newIsJumping = true
-            newIsSquatting = false // Can't squat while jumping
-          }
-        }
-
-        // Gravity
-        newVelocity.y += 0.8
-
-        // Update position
-        newPosition.x += newVelocity.x
-        newPosition.y += newVelocity.y
-
-        // Player bounds
-        const playerRight = newPosition.x + gameConstants.PLAYER_WIDTH
-        const playerLeft = newPosition.x
-        const playerTop = newPosition.y
-        const playerBottom = newPosition.y + gameConstants.PLAYER_HEIGHT
-
-        // Check if player is over the pipe horizontally
-        const isOverPipeX = playerRight > gameConstants.PIPE_BOX.left && playerLeft < gameConstants.PIPE_BOX.right
-
-        // Ground collision (stand at GROUND_Y)
-        // Only apply ground collision if player is not on top of the pipe
-        const isStandingOnPipe = isOverPipeX && Math.abs(newPosition.y - gameConstants.PIPE_TOP_Y) < 10 && prevPlayer.pipeAnimation === 'none'
-        
-        if (newPosition.y >= gameConstants.PLAYER_GROUND_Y && !isStandingOnPipe && prevPlayer.pipeAnimation === 'none') {
-          newPosition.y = gameConstants.PLAYER_GROUND_Y
-          newVelocity.y = 0
-          newIsJumping = false
-        }
-
-        // Screen boundaries (fixed canvas coordinates)
-        if (newPosition.x < 0) newPosition.x = 0
-        if (newPosition.x > gameConstants.gameWidth - gameConstants.PLAYER_WIDTH) {
-          newPosition.x = gameConstants.gameWidth - gameConstants.PLAYER_WIDTH
-        }
-
-        // Check if player is standing on top of the pipe
-        const isOnPipeTop = Math.abs(newPosition.y - gameConstants.PIPE_TOP_Y) < 10 && isOverPipeX
-
-        // Pipe entry logic - squat on pipe to enter
-        if (newIsSquatting && isOnPipeTop && prevPlayer.pipeAnimation === 'none') {
-          const transitionStarted = triggerPipeTravel(prevPlayer.isUnderground)
-
-          if (transitionStarted) {
-            return {
-              ...prevPlayer,
-              position: { x: gameConstants.getPipeCenterX(prevPlayer.direction), y: gameConstants.PIPE_TOP_Y },
-              velocity: { x: 0, y: 0 },
-              isSquatting: true,
-              isJumping: false,
-              pipeAnimation: 'priming'
-            }
-          }
-        }
-
-        // Pipe collision - treat as solid platform
-        if (prevPlayer.pipeAnimation === 'none') {
-          // Check if player is horizontally overlapping with pipe
-          const isOverPipeXRange = playerRight > gameConstants.PIPE_BOX.left && playerLeft < gameConstants.PIPE_BOX.right
-          
-          // Check if player is close to pipe top position
-          const distanceToPipeTop = Math.abs(newPosition.y - gameConstants.PIPE_TOP_Y)
-          
-          // If player is very close to pipe top and over the pipe, lock them there
-          if (isOverPipeXRange && distanceToPipeTop < 8) {
-            // Firmly lock position to prevent any jitter
-            newPosition.y = gameConstants.PIPE_TOP_Y
-            newVelocity.y = 0
-            newIsJumping = false
-          }
-          // If player is falling down and approaching pipe top
-          else if (isOverPipeXRange && newVelocity.y > 0 && distanceToPipeTop < 20) {
-            // Check if player's bottom is near or past the pipe top
-            if (playerBottom >= gameConstants.PIPE_BOX.top - 5 && playerBottom <= gameConstants.PIPE_BOX.top + 20) {
-              newVelocity.y = 0
-              newPosition.y = gameConstants.PIPE_TOP_Y
-              newIsJumping = false
-            }
-          }
-          
-          // Handle side collisions only when player is NOT on top of pipe
-          const isOnPipeTopNow = isOverPipeXRange && distanceToPipeTop < 8
-          if (!isOnPipeTopNow && playerBottom > gameConstants.PIPE_BOX.top + 15) {
-            const isPipeOverlapping =
-              playerRight > gameConstants.PIPE_BOX.left &&
-              playerLeft < gameConstants.PIPE_BOX.right &&
-              playerBottom > gameConstants.PIPE_BOX.top &&
-              playerTop < gameConstants.PIPE_BOX.bottom
-
-            if (isPipeOverlapping) {
-              const overlapLeft = playerRight - gameConstants.PIPE_BOX.left
-              const overlapRight = gameConstants.PIPE_BOX.right - playerLeft
-              
-              // Push player away from pipe sides
-              if (overlapLeft < overlapRight && overlapLeft < 15) {
-                newVelocity.x = 0
-                newPosition.x = gameConstants.PIPE_BOX.left - gameConstants.PLAYER_WIDTH
-              } else if (overlapRight < overlapLeft && overlapRight < 15) {
-                newVelocity.x = 0
-                newPosition.x = gameConstants.PIPE_BOX.right
-              }
-            }
-          }
-        }
-
-        // Brick collision detection - use ref to avoid dependency
-        // Early exit optimization: only check bricks near the player
-        // Reuse player bounds variables declared above
-        const playerCenterX = newPosition.x + gameConstants.PLAYER_WIDTH / 2
-        const checkRadius = gameConstants.BRICK_SIZE * 2 // Only check bricks within 2x brick size
-        
-        bricksRef.current.forEach(brick => {
-          // Quick distance check to skip far-away bricks
-          const brickCenterX = brick.position.x + gameConstants.BRICK_SIZE / 2
-          const brickCenterY = brick.position.y + gameConstants.BRICK_SIZE / 2
-          const dx = Math.abs(playerCenterX - brickCenterX)
-          const dy = Math.abs((playerTop + playerBottom) / 2 - brickCenterY)
-          
-          if (dx > checkRadius || dy > checkRadius) {
-            return // Skip this brick, it's too far away
-          }
-          
-          const brickTop = brick.position.y
-          const brickBottom = brick.position.y + gameConstants.BRICK_SIZE
-          const brickLeft = brick.position.x
-          const brickRight = brick.position.x + gameConstants.BRICK_SIZE
-
-          // Check for collision overlap
-          const isOverlapping =
-            playerRight > brickLeft &&
-            playerLeft < brickRight &&
-            playerBottom > brickTop &&
-            playerTop < brickBottom
-
-          if (isOverlapping) {
-            // Calculate overlap on each side
-            const overlapLeft = playerRight - brickLeft
-            const overlapRight = brickRight - playerLeft
-            const overlapTop = playerBottom - brickTop
-            const overlapBottom = brickBottom - playerTop
-
-            // Find the smallest overlap to determine collision direction
-            const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom)
-
-            // Hit from below (trigger brick)
-            if (minOverlap === overlapBottom && newVelocity.y < 0 && playerCenterX > brickLeft && playerCenterX < brickRight) {
-              // Mark brick as hit in the persistent set
-              hitBricksRef.current.add(brick.id)
-              // Update state outside of setPlayer callback for better performance
-              setBricks(prevBricks => {
-                const updated = prevBricks.map(b =>
-                  b.id === brick.id ? { ...b, hit: true } : b
-                )
-                bricksRef.current = updated
-                return updated
-              })
-              setSelectedBrick(brick)
-              newVelocity.y = 0
-              newPosition.y = brickBottom
-            }
-            // Hit from top (land on brick)
-            else if (minOverlap === overlapTop && newVelocity.y > 0) {
-              newVelocity.y = 0
-              newPosition.y = brickTop - gameConstants.PLAYER_HEIGHT
-              newIsJumping = false
-            }
-            // Hit from left
-            else if (minOverlap === overlapLeft) {
-              newVelocity.x = 0
-              newPosition.x = brickLeft - gameConstants.PLAYER_WIDTH
-            }
-            // Hit from right
-            else if (minOverlap === overlapRight) {
-              newVelocity.x = 0
-              newPosition.x = brickRight
-            }
-          }
-        })
-
-        // Update state - React will batch and optimize re-renders
-        return {
-          position: newPosition,
-          velocity: newVelocity,
-          isJumping: newIsJumping,
-          isSquatting: newIsSquatting,
-          isUnderground: newIsUnderground,
-          direction: newDirection,
-          pipeAnimation: prevPlayer.pipeAnimation
-        }
-      })
+    if (!gameStarted) {
+      // Stop physics engine if game hasn't started
+      if (physicsEngineRef.current) {
+        physicsEngineRef.current.stop()
+        physicsEngineRef.current = null
       }
-      
-      animationFrameId = requestAnimationFrame(gameLoop)
+      return
     }
 
-    animationFrameId = requestAnimationFrame(gameLoop)
+    // Convert game constants to physics engine format
+    const physicsConstants: PhysicsGameConstants = {
+      gameWidth: gameConstants.gameWidth,
+      gameHeight: gameConstants.gameHeight,
+      PLAYER_GROUND_Y: gameConstants.PLAYER_GROUND_Y,
+      PLAYER_WIDTH: gameConstants.PLAYER_WIDTH,
+      PLAYER_HEIGHT: gameConstants.PLAYER_HEIGHT,
+      BRICK_SIZE: gameConstants.BRICK_SIZE,
+      PIPE_BOX: gameConstants.PIPE_BOX,
+      PIPE_TOP_Y: gameConstants.PIPE_TOP_Y,
+      getPipeCenterX: gameConstants.getPipeCenterX
+    }
+
+    // Create physics engine callbacks (use refs to always get latest values)
+    const callbacks = {
+      onPlayerUpdate: (updatedPlayer: Player) => {
+        setPlayer(updatedPlayer)
+      },
+      onBrickHit: (brick: Brick) => {
+        // Mark brick as hit in the persistent set
+        hitBricksRef.current.add(brick.id)
+        // Update state
+        setBricks(prevBricks => {
+          const updated = prevBricks.map(b =>
+            b.id === brick.id ? { ...b, hit: true } : b
+          )
+          bricksRef.current = updated
+          return updated
+        })
+        setSelectedBrick(brick)
+      },
+      onPipeTravel: (currentIsUnderground: boolean) => {
+        return triggerPipeTravel(currentIsUnderground)
+      },
+      getBricks: () => bricksRef.current,
+      getSelectedBrick: () => selectedBrickRef.current,
+      getPipeAnimation: () => playerRef.current.pipeAnimation,
+      getPlayer: () => playerRef.current
+    }
+
+    // Create or update physics engine
+    if (!physicsEngineRef.current) {
+      physicsEngineRef.current = new PlayerPhysics(
+        playerRef.current,
+        physicsConstants,
+        callbacks,
+        isMobilePortrait
+      )
+      physicsEngineRef.current.start()
+    } else {
+      // Update existing engine
+      physicsEngineRef.current.updateConstants(physicsConstants)
+      physicsEngineRef.current.updateMobilePortrait(isMobilePortrait)
+      physicsEngineRef.current.updatePlayer(playerRef.current)
+    }
 
     return () => {
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId)
+      if (physicsEngineRef.current) {
+        physicsEngineRef.current.stop()
+        physicsEngineRef.current = null
       }
     }
-  }, [selectedBrick, gameStarted, triggerPipeTravel, gameConstants]) // Removed bricks from deps - using ref instead
+  }, [gameStarted, gameConstants, isMobilePortrait, triggerPipeTravel])
+
+  // Update physics engine when keys change
+  useEffect(() => {
+    if (physicsEngineRef.current) {
+      physicsEngineRef.current.setKeys(keys)
+    }
+  }, [keys])
+
+  // Update physics engine when player is updated externally (e.g., pipe animations)
+  useEffect(() => {
+    if (physicsEngineRef.current && player.pipeAnimation !== 'none') {
+      physicsEngineRef.current.updatePlayer(player)
+    }
+  }, [player.pipeAnimation])
 
   const closeModal = useCallback(() => {
     setSelectedBrick(null)

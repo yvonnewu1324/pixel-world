@@ -88,7 +88,7 @@
     border-top: 4px solid #000;
     border-bottom: none;
     margin: 0;
-    animation: slideUpMobile 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    animation: slideUpMobile 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     overflow: hidden;
     display: flex;
     flex-direction: column;
