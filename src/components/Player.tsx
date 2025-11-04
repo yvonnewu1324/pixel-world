@@ -4,9 +4,10 @@ import './Player.css'
 
 interface PlayerProps {
   player: Player
+  isMobilePortrait?: boolean
 }
 
-function PlayerComponent({ player }: PlayerProps) {
+function PlayerComponent({ player, isMobilePortrait = false }: PlayerProps) {
   // Determine animation state
   const isMoving = player.velocity.x !== 0
   const isJumping = player.isJumping
@@ -37,7 +38,7 @@ function PlayerComponent({ player }: PlayerProps) {
 
   return (
     <div
-      className={`player ${player.direction === 'left' ? 'face-left' : ''} ${pipeAnimationClass} ${inPipeClass}`}
+      className={`player ${player.direction === 'left' ? 'face-left' : ''} ${pipeAnimationClass} ${inPipeClass} ${isMobilePortrait ? 'player--mobile' : ''}`}
       style={{
         left: `${player.position.x}px`,
         top: `${player.position.y}px`,

@@ -4,6 +4,16 @@
   pointer-events: none; /* Don't block player movement */
   width: 86px; /* Use game's internal coordinate system */
   height: 86px;
+  /* Prevent layout shift during animations */
+  will-change: auto;
+  transform: translateZ(0); /* GPU acceleration to prevent reflow */
+  backface-visibility: hidden; /* Prevent flickering */
+}
+
+/* Mobile scaling - scale down pipe for smaller canvas */
+.pipe--mobile {
+  width: 64.5px; /* 86px * 0.75 = 64.5px */
+  height: 64.5px;
 }
 
 .pipe-image {

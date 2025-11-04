@@ -1,0 +1,126 @@
+.virtual-controls {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  pointer-events: none;
+  padding: 0 20px;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Ensure all virtual control children are non-selectable */
+.virtual-controls * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.virtual-controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 400px;
+  gap: 40px;
+}
+
+.virtual-controls-group {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.virtual-controls-group-vertical {
+  flex-direction: column;
+  gap: 12px;
+}
+
+.virtual-button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  border: 3px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.1s;
+  color: #000;
+}
+
+.virtual-button:active {
+  background: rgba(200, 200, 200, 0.95);
+  transform: scale(0.95);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.virtual-button svg {
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+
+/* Responsive sizing for smaller screens */
+@media (max-width: 480px) {
+  .virtual-controls {
+    bottom: 15px;
+    padding: 0 15px;
+  }
+
+  .virtual-controls-row {
+    max-width: 100%;
+    gap: 30px;
+  }
+
+  .virtual-button {
+    width: 55px;
+    height: 55px;
+  }
+
+  .virtual-button svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .virtual-controls-group {
+    gap: 10px;
+  }
+
+  .virtual-controls-group-vertical {
+    gap: 10px;
+  }
+}
+
+/* Landscape mode adjustments */
+@media (orientation: landscape) and (max-height: 600px) {
+  .virtual-controls {
+    bottom: 10px;
+  }
+
+  .virtual-button {
+    width: 50px;
+    height: 50px;
+  }
+
+  .virtual-button svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .virtual-controls-row {
+    gap: 25px;
+  }
+}
+

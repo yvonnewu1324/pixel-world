@@ -29,7 +29,10 @@
   width: 85%;
   max-height: 85vh;
   overflow-y: auto;
+  overflow-x: hidden;
   animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Wider modal for Experience section */
@@ -64,6 +67,354 @@
   text-transform: uppercase;
   color: #000;
   font-weight: bold;
+}
+
+/* Mobile responsive modal */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+
+  .modal-content {
+    width: 100%;
+    max-width: 100%;
+    max-height: 80vh; /* Fallback */
+    max-height: calc(100vh - 120px); /* Account for Chrome's larger browser UI (address bar ~60px + nav bar ~60px) */
+    border-radius: 20px 20px 0 0;
+    border-left: none;
+    border-right: none;
+    border-top: 4px solid #000;
+    border-bottom: none;
+    margin: 0;
+    animation: slideUpMobile 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  @keyframes slideUpMobile {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .modal-content.experience-modal {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .modal-header {
+    padding: 16px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom-width: 3px;
+  }
+
+  .modal-header h2 {
+    font-size: 22px;
+    line-height: 1.2;
+  }
+
+  .close-button {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    border-width: 3px;
+    flex-shrink: 0;
+  }
+
+  .modal-body {
+    padding: 16px 20px;
+    max-height: calc(100vh - 180px); /* Account for Chrome's browser UI (~120px) + header (~60px, footer is hidden) */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    min-height: 0; /* Allow flexbox to shrink */
+  }
+
+  .modal-description {
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 18px;
+  }
+
+  .modal-list {
+    margin: 0;
+  }
+
+  .modal-list li {
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    padding-left: 14px;
+    margin-bottom: 12px;
+    border-width: 2px;
+  }
+
+  .modal-list li.experience-item {
+    padding-left: 16px;
+  }
+
+  .modal-list li::before {
+    display: none; /* Hide star on mobile for cleaner look */
+  }
+
+  /* Experience items - vertical layout on mobile */
+  .modal-list li.experience-item .experience-line {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px;
+  }
+
+  .modal-list li.experience-item .experience-right-text {
+    margin-left: 0 !important;
+    white-space: normal !important;
+    font-size: 13px;
+    color: #666;
+    font-weight: normal;
+    align-self: flex-start;
+  }
+
+  .modal-list li.experience-item .experience-main-text {
+    width: 100%;
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  .modal-list li.experience-item .experience-right-text {
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Education items - vertical layout on mobile (same as experience) */
+  .modal-list li.education-item .education-line {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px;
+  }
+
+  .modal-list li.education-item .experience-right-text {
+    margin-left: 0 !important;
+    white-space: normal !important;
+    font-size: 13px;
+    color: #666;
+    font-weight: normal;
+    align-self: flex-start;
+  }
+
+  .modal-list li.education-item .experience-main-text {
+    width: 100%;
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  .modal-list li.education-item .experience-right-text {
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .hint {
+    font-size: 13px;
+    padding: 12px;
+  }
+
+  .desktop-hint {
+    display: none !important;
+  }
+
+  .mobile-hint {
+    display: block !important;
+  }
+
+  .modal-footer {
+    display: none !important;
+  }
+
+  .contact-buttons {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 0;
+  }
+
+  .contact-button {
+    padding: 20px;
+    min-height: 110px;
+    border-width: 3px;
+  }
+
+  .contact-icon {
+    font-size: 44px;
+    margin-bottom: 8px;
+  }
+
+  .contact-label {
+    font-size: 13px;
+  }
+
+  .github-link {
+    font-size: 13px;
+    padding: 10px 18px;
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  /* Project items on mobile */
+  .modal-list li.project-item > div > div:first-child {
+    font-size: 16px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .modal-list li.project-item > div > div:nth-child(2) {
+    font-size: 14px !important;
+    margin-bottom: 10px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    width: 100%;
+    max-width: 100%;
+    max-height: 80vh; /* Fallback */
+    max-height: calc(100vh - 120px); /* Account for Chrome's larger browser UI */
+    border-radius: 16px 16px 0 0;
+    overflow: hidden;
+  }
+
+  .modal-content.experience-modal {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .modal-header {
+    padding: 14px 16px;
+  }
+
+  .modal-header h2 {
+    font-size: 20px;
+  }
+
+  .close-button {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .modal-body {
+    padding: 14px 16px;
+    max-height: calc(100vh - 170px); /* Account for Chrome's browser UI (~120px) + header (~50px, footer is hidden) */
+    overflow-x: hidden;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .modal-description {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .modal-list li {
+    padding: 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    padding-left: 14px;
+    margin-bottom: 10px;
+  }
+
+  .modal-list li.experience-item {
+    padding-left: 14px;
+  }
+
+  .modal-list li.education-item {
+    padding-left: 14px;
+  }
+
+  /* Education items - vertical layout on small mobile */
+  .modal-list li.education-item .education-line {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px;
+  }
+
+  .modal-list li.education-item .experience-right-text {
+    margin-left: 0 !important;
+    white-space: normal !important;
+    font-size: 12px;
+    color: #666;
+    font-weight: normal;
+    align-self: flex-start;
+  }
+
+  .modal-list li.education-item .experience-main-text {
+    width: 100%;
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .modal-list li.experience-item div span:last-child {
+    font-size: 12px;
+  }
+
+  .hint {
+    font-size: 12px;
+    padding: 10px;
+  }
+
+  .desktop-hint {
+    display: none !important;
+  }
+
+  .mobile-hint {
+    display: block !important;
+  }
+
+  .modal-footer {
+    display: none !important;
+  }
+
+  .contact-button {
+    padding: 18px;
+    min-height: 100px;
+  }
+
+  .contact-icon {
+    font-size: 40px;
+    margin-bottom: 6px;
+  }
+
+  .contact-label {
+    font-size: 12px;
+  }
+
+  .github-link {
+    font-size: 12px;
+    padding: 8px 16px;
+  }
+
+  /* Project items on small mobile */
+  .modal-list li.project-item > div > div:first-child {
+    font-size: 15px !important;
+  }
+
+  .modal-list li.project-item > div > div:nth-child(2) {
+    font-size: 13px !important;
+  }
 }
 
 .close-button {
@@ -133,6 +484,20 @@
   word-wrap: break-word;
   overflow-wrap: break-word;
   max-width: 100%;
+  box-sizing: border-box;
+}
+
+.experience-main-text {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.experience-right-text {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 .modal-list li span:last-child {
@@ -172,6 +537,25 @@
   font-size: 16px;
   color: #fff;
   opacity: 0.7;
+}
+
+.desktop-hint {
+  display: block;
+}
+
+.mobile-hint {
+  display: none;
+}
+
+/* Hide desktop hint on mobile devices */
+@media (max-width: 768px) {
+  .desktop-hint {
+    display: none !important;
+  }
+  
+  .mobile-hint {
+    display: block !important;
+  }
 }
 
 /* Scrollbar styling */
