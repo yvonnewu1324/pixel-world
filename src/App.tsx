@@ -418,9 +418,24 @@ function App() {
     })
   }, [])
 
+  const handleStartGame = useCallback(() => {
+    setShowWelcome(false)
+    setGameStarted(true)
+    // Clear any keys that might have been pressed before game started
+    setKeys(new Set())
+    keysRef.current = new Set()
+  }, [])
+
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // If welcome page is showing and Enter is pressed, start the game
+      if (showWelcome && (e.key === 'Enter' || e.key === 'Return')) {
+        e.preventDefault()
+        handleStartGame()
+        return
+      }
+      
       // Prevent default browser behavior for game keys (only when game started)
       if (GAME_KEYS.includes(e.key) && gameStarted) {
         e.preventDefault()
@@ -456,7 +471,7 @@ function App() {
       window.removeEventListener('keydown', handleKeyDown, true)
       window.removeEventListener('keyup', handleKeyUp, true)
     }
-  }, [gameStarted])
+  }, [gameStarted, showWelcome, handleStartGame])
 
   // Game loop - use requestAnimationFrame for better performance
   useEffect(() => {
@@ -711,14 +726,6 @@ function App() {
 
   const closeModal = useCallback(() => {
     setSelectedBrick(null)
-  }, [])
-
-  const handleStartGame = useCallback(() => {
-    setShowWelcome(false)
-    setGameStarted(true)
-    // Clear any keys that might have been pressed before game started
-    setKeys(new Set())
-    keysRef.current = new Set()
   }, [])
 
   // Memoize pipe position to prevent recreation on every render
