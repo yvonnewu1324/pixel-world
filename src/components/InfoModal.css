@@ -29,7 +29,10 @@
   width: 85%;
   max-height: 85vh;
   overflow-y: auto;
+  overflow-x: hidden;
   animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Wider modal for Experience section */
@@ -71,12 +74,14 @@
   .modal-overlay {
     padding: 0;
     align-items: flex-end;
+    overflow: hidden;
   }
 
   .modal-content {
     width: 100%;
     max-width: 100%;
-    max-height: 95vh;
+    max-height: 80vh; /* Fallback */
+    max-height: calc(100vh - 120px); /* Account for Chrome's larger browser UI (address bar ~60px + nav bar ~60px) */
     border-radius: 20px 20px 0 0;
     border-left: none;
     border-right: none;
@@ -84,6 +89,9 @@
     border-bottom: none;
     margin: 0;
     animation: slideUpMobile 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   @keyframes slideUpMobile {
@@ -125,9 +133,13 @@
 
   .modal-body {
     padding: 16px 20px;
-    max-height: calc(95vh - 80px);
+    max-height: calc(100vh - 180px); /* Account for Chrome's browser UI (~120px) + header (~60px, footer is hidden) */
     overflow-y: auto;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    min-height: 0; /* Allow flexbox to shrink */
   }
 
   .modal-description {
@@ -175,6 +187,44 @@
 
   .modal-list li.experience-item .experience-main-text {
     width: 100%;
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  .modal-list li.experience-item .experience-right-text {
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Education items - vertical layout on mobile (same as experience) */
+  .modal-list li.education-item .education-line {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px;
+  }
+
+  .modal-list li.education-item .experience-right-text {
+    margin-left: 0 !important;
+    white-space: normal !important;
+    font-size: 13px;
+    color: #666;
+    font-weight: normal;
+    align-self: flex-start;
+  }
+
+  .modal-list li.education-item .experience-main-text {
+    width: 100%;
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  .modal-list li.education-item .experience-right-text {
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   .hint {
@@ -183,18 +233,15 @@
   }
 
   .desktop-hint {
-    display: none;
+    display: none !important;
   }
 
   .mobile-hint {
-    display: block;
+    display: block !important;
   }
 
   .modal-footer {
-    padding: 12px;
-    position: sticky;
-    bottom: 0;
-    background: #333;
+    display: none !important;
   }
 
   .contact-buttons {
@@ -242,8 +289,10 @@
   .modal-content {
     width: 100%;
     max-width: 100%;
-    max-height: 96vh;
+    max-height: 80vh; /* Fallback */
+    max-height: calc(100vh - 120px); /* Account for Chrome's larger browser UI */
     border-radius: 16px 16px 0 0;
+    overflow: hidden;
   }
 
   .modal-content.experience-modal {
@@ -267,7 +316,10 @@
 
   .modal-body {
     padding: 14px 16px;
-    max-height: calc(96vh - 75px);
+    max-height: calc(100vh - 170px); /* Account for Chrome's browser UI (~120px) + header (~50px, footer is hidden) */
+    overflow-x: hidden;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   .modal-description {
@@ -288,6 +340,33 @@
     padding-left: 14px;
   }
 
+  .modal-list li.education-item {
+    padding-left: 14px;
+  }
+
+  /* Education items - vertical layout on small mobile */
+  .modal-list li.education-item .education-line {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px;
+  }
+
+  .modal-list li.education-item .experience-right-text {
+    margin-left: 0 !important;
+    white-space: normal !important;
+    font-size: 12px;
+    color: #666;
+    font-weight: normal;
+    align-self: flex-start;
+  }
+
+  .modal-list li.education-item .experience-main-text {
+    width: 100%;
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
   .modal-list li.experience-item div span:last-child {
     font-size: 12px;
   }
@@ -298,15 +377,15 @@
   }
 
   .desktop-hint {
-    display: none;
+    display: none !important;
   }
 
   .mobile-hint {
-    display: block;
+    display: block !important;
   }
 
   .modal-footer {
-    padding: 10px;
+    display: none !important;
   }
 
   .contact-button {
@@ -405,6 +484,20 @@
   word-wrap: break-word;
   overflow-wrap: break-word;
   max-width: 100%;
+  box-sizing: border-box;
+}
+
+.experience-main-text {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.experience-right-text {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 .modal-list li span:last-child {
@@ -452,6 +545,17 @@
 
 .mobile-hint {
   display: none;
+}
+
+/* Hide desktop hint on mobile devices */
+@media (max-width: 768px) {
+  .desktop-hint {
+    display: none !important;
+  }
+  
+  .mobile-hint {
+    display: block !important;
+  }
 }
 
 /* Scrollbar styling */

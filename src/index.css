@@ -16,6 +16,8 @@ body {
   /* Touch optimizations */
   touch-action: manipulation;
   -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 
@@ -43,6 +45,8 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* Mobile portrait mode - ensure root takes full height */

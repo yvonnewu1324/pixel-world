@@ -10,8 +10,18 @@
   transform-origin: top left;
 }
 
+/* Mobile scaling - scale down objects for smaller canvas */
+.player--mobile {
+  transform: scale(0.225); /* 0.3 * 0.75 = 0.225 (75% of desktop size) */
+}
+
 /* Flip horizontally (face left) */
 .player.face-left .sprite {
+  transform: scaleX(-1);
+}
+
+/* Mobile face-left - sprite needs to flip within the scaled container */
+.player--mobile.face-left .sprite {
   transform: scaleX(-1);
 }
 
@@ -89,6 +99,30 @@
   }
 }
 
+/* Mobile pipe animations */
+.player--mobile.player--entering-pipe {
+  animation: slide-into-pipe-mobile 1s ease-in forwards;
+}
+
+.player--mobile.player--exiting-pipe {
+  animation: slide-out-of-pipe-mobile 1s ease-out forwards;
+}
+
+@keyframes slide-into-pipe-mobile {
+  0% {
+    transform: scale(0.225) translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.225) translateY(300px);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(0.225) translateY(600px);
+    opacity: 0;
+  }
+}
+
 /* Pipe Animation: Slide up out of pipe */
 .player--exiting-pipe {
   animation: slide-out-of-pipe 1s ease-out forwards;
@@ -113,6 +147,21 @@
   }
   100% {
     transform: scale(0.3) translateY(0); /* End at pipe top */
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out-of-pipe-mobile {
+  0% {
+    transform: scale(0.225) translateY(600px);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(0.225) translateY(300px);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(0.225) translateY(0);
     opacity: 1;
   }
 }

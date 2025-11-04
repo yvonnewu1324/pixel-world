@@ -6,9 +6,10 @@ import CookingIcon from './CookingIcon'
 
 interface BrickProps {
   brick: Brick
+  isMobilePortrait?: boolean
 }
 
-function BrickComponent({ brick }: BrickProps) {
+function BrickComponent({ brick, isMobilePortrait = false }: BrickProps) {
   const wasHitRef = useRef(false)
   const shouldAnimateRef = useRef(false)
   
@@ -35,7 +36,7 @@ function BrickComponent({ brick }: BrickProps) {
   
   return (
     <div
-      className={`brick ${brick.hit ? 'hit' : ''} ${shouldAnimateRef.current ? 'hit-just' : ''} brick-${brick.type}`}
+      className={`brick ${brick.hit ? 'hit' : ''} ${shouldAnimateRef.current ? 'hit-just' : ''} brick-${brick.type} ${isMobilePortrait ? 'brick--mobile' : ''}`}
       style={{
         left: `${brick.position.x}px`,
         top: `${brick.position.y}px`,

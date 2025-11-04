@@ -9,6 +9,16 @@
   z-index: 1000;
   pointer-events: none;
   padding: 0 20px;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Ensure all virtual control children are non-selectable */
+.virtual-controls * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .virtual-controls-row {

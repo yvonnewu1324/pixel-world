@@ -72,6 +72,17 @@
   justify-content: center;
   z-index: 2000;
   animation: fadeIn 0.5s ease-out;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
+/* Prevent selection in welcome dialog children (except button text is fine) */
+.welcome-dialog * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .welcome-scene {
@@ -195,6 +206,27 @@
     flex-direction: column;
     gap: 20px;
   }
+
+  /* Speech balloon tail - points down (towards character below) on mobile */
+  .speech-balloon::before {
+    top: auto;
+    bottom: -30px;
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 30px 25px 0 25px;
+    border-color: #000 transparent transparent transparent;
+  }
+
+  .speech-balloon::after {
+    top: auto;
+    bottom: -24px;
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 24px 20px 0 20px;
+    border-color: #fff transparent transparent transparent;
+  }
 }
 
 @media (max-width: 480px) {
@@ -220,6 +252,27 @@
 
   .character-sprite {
     width: 150px;
+  }
+
+  /* Speech balloon tail - points down (towards character below) on mobile */
+  .speech-balloon::before {
+    top: auto;
+    bottom: -30px;
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 30px 25px 0 25px;
+    border-color: #000 transparent transparent transparent;
+  }
+
+  .speech-balloon::after {
+    top: auto;
+    bottom: -24px;
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 24px 20px 0 20px;
+    border-color: #fff transparent transparent transparent;
   }
 }
 

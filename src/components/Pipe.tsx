@@ -9,12 +9,12 @@ interface PipeProps {
   canvasHeight?: number
 }
 
-function Pipe({ position, isUnderground = false }: PipeProps) {
+function Pipe({ position, isUnderground = false, isMobilePortrait = false }: PipeProps) {
   // Always use top positioning for consistency with collision detection
   // position.y is calculated to align pipe bottom with GROUND_Y for mobile
   return (
     <div 
-      className={`pipe ${isUnderground ? 'pipe--underground' : ''}`}
+      className={`pipe ${isUnderground ? 'pipe--underground' : ''} ${isMobilePortrait ? 'pipe--mobile' : ''}`}
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,

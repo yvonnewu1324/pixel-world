@@ -11,22 +11,35 @@ import { useMobilePortrait } from './hooks/useMobilePortrait'
 const DESKTOP_GAME_WIDTH = 1400
 const DESKTOP_GAME_HEIGHT = 600
 
-// Mobile portrait game canvas dimensions (vertical ratio ~1:2)
-const MOBILE_GAME_WIDTH = 450
-const MOBILE_GAME_HEIGHT = 900
+// Mobile portrait game canvas dimensions (iPhone SE: 375x667)
+const MOBILE_GAME_WIDTH = 375
+const MOBILE_GAME_HEIGHT = 667
 const BRICK_SIZE = 80
 const PLAYER_WIDTH = 125  // 416px * 0.3 scale
 const PLAYER_HEIGHT = 187  // 624px * 0.3 scale
 
+// Mobile scaling factor (75% of desktop size)
+const MOBILE_SCALE = 0.75
+const MOBILE_BRICK_SIZE = BRICK_SIZE * MOBILE_SCALE  // 60px
+const MOBILE_PLAYER_WIDTH = PLAYER_WIDTH * MOBILE_SCALE  // ~94px
+const MOBILE_PLAYER_HEIGHT = PLAYER_HEIGHT * MOBILE_SCALE  // ~140px
+
 // Game keys array - defined outside component to prevent recreation
 const GAME_KEYS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'a', 'A', 'd', 'D', 'w', 'W', 's', 'S', ' ']
 
-// Pipe constants (same for both desktop and mobile)
+// Pipe constants
 const PIPE_WIDTH = 86
 const PIPE_HEIGHT = 86
 const PIPE_COLLISION_INSET_LEFT = 26
 const PIPE_COLLISION_INSET_RIGHT = 14
 const PIPE_COLLISION_INSET = 14
+
+// Mobile pipe constants (scaled down)
+const MOBILE_PIPE_WIDTH = PIPE_WIDTH * MOBILE_SCALE  // ~64.5px
+const MOBILE_PIPE_HEIGHT = PIPE_HEIGHT * MOBILE_SCALE  // ~64.5px
+const MOBILE_PIPE_COLLISION_INSET_LEFT = PIPE_COLLISION_INSET_LEFT * MOBILE_SCALE  // ~19.5px
+const MOBILE_PIPE_COLLISION_INSET_RIGHT = PIPE_COLLISION_INSET_RIGHT * MOBILE_SCALE  // ~10.5px
+const MOBILE_PIPE_COLLISION_INSET = PIPE_COLLISION_INSET * MOBILE_SCALE  // ~10.5px
 const PIPE_SQUAT_DURATION = 220
 const PIPE_ENTER_DURATION = 1000
 const PIPE_EXIT_DURATION = 1000
@@ -34,6 +47,16 @@ const PIPE_TRANSITION_BUFFER = 160
 
 // Helper function to calculate game constants based on dimensions
 function calculateGameConstants(gameWidth: number, gameHeight: number, isMobilePortrait: boolean = false) {
+  // Use mobile-scaled constants for mobile, desktop constants for desktop
+  const currentBrickSize = isMobilePortrait ? MOBILE_BRICK_SIZE : BRICK_SIZE
+  const currentPlayerWidth = isMobilePortrait ? MOBILE_PLAYER_WIDTH : PLAYER_WIDTH
+  const currentPlayerHeight = isMobilePortrait ? MOBILE_PLAYER_HEIGHT : PLAYER_HEIGHT
+  const currentPipeWidth = isMobilePortrait ? MOBILE_PIPE_WIDTH : PIPE_WIDTH
+  const currentPipeHeight = isMobilePortrait ? MOBILE_PIPE_HEIGHT : PIPE_HEIGHT
+  const currentPipeCollisionInsetLeft = isMobilePortrait ? MOBILE_PIPE_COLLISION_INSET_LEFT : PIPE_COLLISION_INSET_LEFT
+  const currentPipeCollisionInsetRight = isMobilePortrait ? MOBILE_PIPE_COLLISION_INSET_RIGHT : PIPE_COLLISION_INSET_RIGHT
+  const currentPipeCollisionInset = isMobilePortrait ? MOBILE_PIPE_COLLISION_INSET : PIPE_COLLISION_INSET
+  
   // Layout proportions:
   // Green grass: 0.1 (10%)
   // Red sand: 0.2 (20%)
@@ -41,7 +64,7 @@ function calculateGameConstants(gameWidth: number, gameHeight: number, isMobileP
   const GREEN_HEIGHT = gameHeight * 0.1
   const GROUND_Y = gameHeight - GREEN_HEIGHT
   const BLACK_EDGE_BOTTOM_Y = GROUND_Y + 4
-  const PLAYER_GROUND_Y = BLACK_EDGE_BOTTOM_Y - PLAYER_HEIGHT
+  const PLAYER_GROUND_Y = BLACK_EDGE_BOTTOM_Y - currentPlayerHeight
   
   // Calculate brick positions
   const NUM_BRICKS = 5
@@ -63,82 +86,63 @@ function calculateGameConstants(gameWidth: number, gameHeight: number, isMobileP
     const LEFT_LOWER_COUNT = 2
     
     // Player stands on green grass area (same as desktop)
-    PLAYER_GROUND_Y_MOBILE = BLACK_EDGE_BOTTOM_Y - PLAYER_HEIGHT
+    PLAYER_GROUND_Y_MOBILE = BLACK_EDGE_BOTTOM_Y - currentPlayerHeight
     
     // Calculate positions for left side bricks
-    const LEFT_GAP = 15 // Gap between bricks
+    const LEFT_GAP = 15 * MOBILE_SCALE // Scale gap proportionally
     
     // Y positions for two rows - lower bricks closer to ground, larger height gap for jumping
     // Lower bricks: closer to ground for easier access
-    const BRICK_Y_LOWER = GROUND_Y - (PLAYER_HEIGHT * 1.2) - BRICK_SIZE
+    const BRICK_Y_LOWER = GROUND_Y - (currentPlayerHeight * 1.2) - currentBrickSize
     BRICK_Y = BRICK_Y_LOWER
     // Upper bricks: more height difference to allow jumping through
-    BRICK_Y_UPPER = BRICK_Y_LOWER - (PLAYER_HEIGHT * 1.5) // Increased height difference for jumping
+    BRICK_Y_UPPER = BRICK_Y_LOWER - (currentPlayerHeight * 1.5) // Increased height difference for jumping
     
     calculateBrickX = (index: number) => {
       if (index < LEFT_LOWER_COUNT) {
         // Left side lower: 0, 1 (Education, Experience) - keep same position
-        return LEFT_MARGIN + (index * (BRICK_SIZE + LEFT_GAP))
+        return LEFT_MARGIN + (index * (currentBrickSize + LEFT_GAP))
       } else {
         // Left side upper: 2, 3, 4 (Projects, Skills, Contact) - moved from right
         const upperIndex = index - LEFT_LOWER_COUNT
-        return LEFT_MARGIN + (upperIndex * (BRICK_SIZE + LEFT_GAP))
+        return LEFT_MARGIN + (upperIndex * (currentBrickSize + LEFT_GAP))
       }
     }
   } else {
     // Desktop: single row layout - keep original settings
-    const TOTAL_BRICK_WIDTH = NUM_BRICKS * BRICK_SIZE
+    const TOTAL_BRICK_WIDTH = NUM_BRICKS * currentBrickSize
     const TOTAL_GAP_WIDTH = AVAILABLE_WIDTH - TOTAL_BRICK_WIDTH
     const GAP_BETWEEN_BRICKS = TOTAL_GAP_WIDTH / (NUM_BRICKS - 1)
     
     // Desktop: original height (keep unchanged)
-    BRICK_Y = GROUND_Y - (PLAYER_HEIGHT * 1.2) - BRICK_SIZE
+    BRICK_Y = GROUND_Y - (currentPlayerHeight * 1.2) - currentBrickSize
     
     calculateBrickX = (index: number) => {
-      return LEFT_MARGIN + (index * (BRICK_SIZE + GAP_BETWEEN_BRICKS))
+      return LEFT_MARGIN + (index * (currentBrickSize + GAP_BETWEEN_BRICKS))
     }
   }
 
   // Pipe position - adjust based on device type
-  const PIPE_X = gameWidth - PIPE_WIDTH - (gameWidth < 500 ? 20 : 50)
+  const PIPE_X = gameWidth - currentPipeWidth - (gameWidth < 500 ? 20 : 50)
   
   // For mobile: pipe bottom aligns with GROUND_Y
   // For desktop: original height
-  let PIPE_Y: number
-  let PIPE_BOX: {
-    left: number
-    right: number
-    top: number
-    bottom: number
-  }
+  const PIPE_Y = GROUND_Y - currentPipeHeight - (isMobilePortrait ? 8 : 12) // Scale offset
   
-  if (isMobilePortrait) {
-    // Mobile: pipe stands on green grass (same logic as desktop)
-    PIPE_Y = GROUND_Y - PIPE_HEIGHT - 12
-    PIPE_BOX = {
-      left: PIPE_X + PIPE_COLLISION_INSET_LEFT,
-      right: PIPE_X + PIPE_WIDTH - PIPE_COLLISION_INSET_RIGHT,
-      top: PIPE_Y + PIPE_COLLISION_INSET,
-      bottom: PIPE_Y + PIPE_HEIGHT
-    }
-  } else {
-    // Desktop: original height
-    PIPE_Y = GROUND_Y - PIPE_HEIGHT - 12
-    PIPE_BOX = {
-      left: PIPE_X + PIPE_COLLISION_INSET_LEFT,
-      right: PIPE_X + PIPE_WIDTH - PIPE_COLLISION_INSET_RIGHT,
-      top: PIPE_Y + PIPE_COLLISION_INSET,
-      bottom: PIPE_Y + PIPE_HEIGHT
-    }
+  const PIPE_BOX = {
+    left: PIPE_X + currentPipeCollisionInsetLeft,
+    right: PIPE_X + currentPipeWidth - currentPipeCollisionInsetRight,
+    top: PIPE_Y + currentPipeCollisionInset,
+    bottom: PIPE_Y + currentPipeHeight
   }
 
   const getPipeCenterX = (direction: 'left' | 'right') => {
-    const baseCenter = (PIPE_BOX.left + PIPE_BOX.right) / 2 - (PLAYER_WIDTH / 2)
-    const VISUAL_OFFSET = direction === 'right' ? -10 : 0
+    const baseCenter = (PIPE_BOX.left + PIPE_BOX.right) / 2 - (currentPlayerWidth / 2)
+    const VISUAL_OFFSET = direction === 'right' ? (isMobilePortrait ? -7.5 : -10) : 0
     return baseCenter + VISUAL_OFFSET
   }
 
-  const PIPE_TOP_Y = PIPE_BOX.top - PLAYER_HEIGHT
+  const PIPE_TOP_Y = PIPE_BOX.top - currentPlayerHeight
 
   return {
     gameWidth,
@@ -153,7 +157,13 @@ function calculateGameConstants(gameWidth: number, gameHeight: number, isMobileP
     PIPE_BOX,
     getPipeCenterX,
     PIPE_TOP_Y,
-    isMobilePortrait
+    isMobilePortrait,
+    // Scaled sizes for collision detection
+    PLAYER_WIDTH: currentPlayerWidth,
+    PLAYER_HEIGHT: currentPlayerHeight,
+    BRICK_SIZE: currentBrickSize,
+    PIPE_WIDTH: currentPipeWidth,
+    PIPE_HEIGHT: currentPipeHeight
   }
 }
 
@@ -411,7 +421,7 @@ function App() {
     setPlayer(prev => ({
       ...prev,
       position: { 
-        x: Math.min(prev.position.x, gameConstants.gameWidth - PLAYER_WIDTH),
+        x: Math.min(prev.position.x, gameConstants.gameWidth - gameConstants.PLAYER_WIDTH),
         y: gameConstants.PLAYER_GROUND_Y 
       }
     }))
@@ -619,7 +629,7 @@ function App() {
     let lastTime = performance.now()
     const targetFPS = 60
     const frameInterval = 1000 / targetFPS
-
+    
     const gameLoop = (currentTime: number) => {
       const deltaTime = currentTime - lastTime
       
@@ -672,8 +682,8 @@ function App() {
           }
 
           // Jump - use ref to get latest key state
-          // Lower jump height for better control
-          const jumpVelocity = isMobilePortrait ? -20 : -18
+          // Lower jump height for mobile (smaller screen, less space)
+          const jumpVelocity = isMobilePortrait ? -17 : -18
           if ((currentKeys.has('ArrowUp') || currentKeys.has('w') || currentKeys.has('W') || currentKeys.has(' ')) && !prevPlayer.isJumping) {
             newVelocity.y = jumpVelocity
             newIsJumping = true
@@ -689,10 +699,10 @@ function App() {
         newPosition.y += newVelocity.y
 
         // Player bounds
-        const playerRight = newPosition.x + PLAYER_WIDTH
+        const playerRight = newPosition.x + gameConstants.PLAYER_WIDTH
         const playerLeft = newPosition.x
         const playerTop = newPosition.y
-        const playerBottom = newPosition.y + PLAYER_HEIGHT
+        const playerBottom = newPosition.y + gameConstants.PLAYER_HEIGHT
 
         // Check if player is over the pipe horizontally
         const isOverPipeX = playerRight > gameConstants.PIPE_BOX.left && playerLeft < gameConstants.PIPE_BOX.right
@@ -709,8 +719,8 @@ function App() {
 
         // Screen boundaries (fixed canvas coordinates)
         if (newPosition.x < 0) newPosition.x = 0
-        if (newPosition.x > gameConstants.gameWidth - PLAYER_WIDTH) {
-          newPosition.x = gameConstants.gameWidth - PLAYER_WIDTH
+        if (newPosition.x > gameConstants.gameWidth - gameConstants.PLAYER_WIDTH) {
+          newPosition.x = gameConstants.gameWidth - gameConstants.PLAYER_WIDTH
         }
 
         // Check if player is standing on top of the pipe
@@ -773,7 +783,7 @@ function App() {
               // Push player away from pipe sides
               if (overlapLeft < overlapRight && overlapLeft < 15) {
                 newVelocity.x = 0
-                newPosition.x = gameConstants.PIPE_BOX.left - PLAYER_WIDTH
+                newPosition.x = gameConstants.PIPE_BOX.left - gameConstants.PLAYER_WIDTH
               } else if (overlapRight < overlapLeft && overlapRight < 15) {
                 newVelocity.x = 0
                 newPosition.x = gameConstants.PIPE_BOX.right
@@ -783,17 +793,26 @@ function App() {
         }
 
         // Brick collision detection - use ref to avoid dependency
+        // Early exit optimization: only check bricks near the player
+        // Reuse player bounds variables declared above
+        const playerCenterX = newPosition.x + gameConstants.PLAYER_WIDTH / 2
+        const checkRadius = gameConstants.BRICK_SIZE * 2 // Only check bricks within 2x brick size
+        
         bricksRef.current.forEach(brick => {
+          // Quick distance check to skip far-away bricks
+          const brickCenterX = brick.position.x + gameConstants.BRICK_SIZE / 2
+          const brickCenterY = brick.position.y + gameConstants.BRICK_SIZE / 2
+          const dx = Math.abs(playerCenterX - brickCenterX)
+          const dy = Math.abs((playerTop + playerBottom) / 2 - brickCenterY)
+          
+          if (dx > checkRadius || dy > checkRadius) {
+            return // Skip this brick, it's too far away
+          }
+          
           const brickTop = brick.position.y
-          const brickBottom = brick.position.y + BRICK_SIZE
+          const brickBottom = brick.position.y + gameConstants.BRICK_SIZE
           const brickLeft = brick.position.x
-          const brickRight = brick.position.x + BRICK_SIZE
-
-          const playerTop = newPosition.y
-          const playerBottom = newPosition.y + PLAYER_HEIGHT
-          const playerLeft = newPosition.x
-          const playerRight = newPosition.x + PLAYER_WIDTH
-          const playerCenterX = newPosition.x + PLAYER_WIDTH / 2
+          const brickRight = brick.position.x + gameConstants.BRICK_SIZE
 
           // Check for collision overlap
           const isOverlapping =
@@ -831,13 +850,13 @@ function App() {
             // Hit from top (land on brick)
             else if (minOverlap === overlapTop && newVelocity.y > 0) {
               newVelocity.y = 0
-              newPosition.y = brickTop - PLAYER_HEIGHT
+              newPosition.y = brickTop - gameConstants.PLAYER_HEIGHT
               newIsJumping = false
             }
             // Hit from left
             else if (minOverlap === overlapLeft) {
               newVelocity.x = 0
-              newPosition.x = brickLeft - PLAYER_WIDTH
+              newPosition.x = brickLeft - gameConstants.PLAYER_WIDTH
             }
             // Hit from right
             else if (minOverlap === overlapRight) {
@@ -847,6 +866,7 @@ function App() {
           }
         })
 
+        // Update state - React will batch and optimize re-renders
         return {
           position: newPosition,
           velocity: newVelocity,

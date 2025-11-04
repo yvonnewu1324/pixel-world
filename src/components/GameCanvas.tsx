@@ -44,7 +44,7 @@ function GameCanvas({ player, bricks, pipePosition, gameWidth, gameHeight, isMob
           </div>
           <div className="ground"></div>
           {bricks.map(brick => (
-            <BrickComponent key={brick.id} brick={brick} />
+            <BrickComponent key={brick.id} brick={brick} isMobilePortrait={isMobilePortrait} />
           ))}
         </>
       )}
@@ -57,7 +57,7 @@ function GameCanvas({ player, bricks, pipePosition, gameWidth, gameHeight, isMob
           </div>
           <div className="ground ground--underground"></div>
           {bricks.map(brick => (
-            <BrickComponent key={brick.id} brick={brick} />
+            <BrickComponent key={brick.id} brick={brick} isMobilePortrait={isMobilePortrait} />
           ))}
         </>
       )}
@@ -65,8 +65,9 @@ function GameCanvas({ player, bricks, pipePosition, gameWidth, gameHeight, isMob
       <Pipe
         position={pipePosition}
         isUnderground={player.isUnderground}
+        isMobilePortrait={isMobilePortrait}
       />
-      <PlayerComponent player={player} />
+      <PlayerComponent player={player} isMobilePortrait={isMobilePortrait} />
     </div>
   )
 }

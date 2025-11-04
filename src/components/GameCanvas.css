@@ -10,6 +10,11 @@
   border: 4px solid #000;
   box-shadow: 0 8px 0 rgba(0, 0, 0, 0.3);
   outline: none; /* Remove focus outline */
+  /* Prevent text/element selection */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
   
   /* Responsive scaling - scale based on viewport */
   transform-origin: top center;
@@ -18,16 +23,23 @@
   transform: scale(min(1, calc(100vw / 1400), calc((100vh - 40px) / 600)));
 }
 
+/* Prevent selection on all game canvas children */
+.game-canvas * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
 /* Mobile portrait canvas - fixed internal size, scale to fit screen */
 .game-canvas--mobile-portrait {
-  /* Fixed internal dimensions - game logic uses these coordinates */
-  width: 450px;
-  height: 900px;
+  /* Fixed internal dimensions - game logic uses these coordinates (iPhone SE: 375x667) */
+  width: 375px;
+  height: 667px;
   /* Scale to fit viewport - adapts to different phone sizes */
   /* Priority: fit width first, then adjust if height doesn't fit */
-  /* For small phones (375px): scale = 375/450 = 0.833 */
+  /* For iPhone SE (375px): scale = 375/375 = 1 */
   /* For larger phones: scale = 1 or smaller based on height */
-  transform: scale(min(1, calc(100vw / 450), calc((100vh - 120px) / 900))) translateZ(0);
+  transform: scale(min(1, calc(100vw / 375), calc((100vh - 120px) / 667))) translateZ(0);
   transform-origin: top center;
   margin: 0 auto;
   border-width: 2px;
@@ -69,9 +81,9 @@
   transform: translateZ(0);
 }
 
-/* Mobile portrait: ground height is fixed (10% of 900px = 90px) */
+/* Mobile portrait: ground height is fixed (10% of 667px = 66.7px) */
 .game-canvas--mobile-portrait .ground {
-  height: 90px; /* Fixed: 10% of mobile canvas height (900px) */
+  height: 66.7px; /* Fixed: 10% of mobile canvas height (667px) */
 }
 
 .ground--underground {
@@ -101,6 +113,9 @@
   padding: 10px;
   border-radius: 4px;
   pointer-events: none; /* Don't block clicks */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .instructions p {

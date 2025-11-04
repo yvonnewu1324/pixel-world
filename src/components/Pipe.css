@@ -10,6 +10,12 @@
   backface-visibility: hidden; /* Prevent flickering */
 }
 
+/* Mobile scaling - scale down pipe for smaller canvas */
+.pipe--mobile {
+  width: 64.5px; /* 86px * 0.75 = 64.5px */
+  height: 64.5px;
+}
+
 .pipe-image {
   position: absolute;
   width: 100%; /* Scale with container */
