@@ -235,6 +235,24 @@ function App() {
   const [selectedBrick, setSelectedBrick] = useState<Brick | null>(null)
   const [showWelcome, setShowWelcome] = useState(true)
   const [gameStarted, setGameStarted] = useState(false)
+  
+  // Check if mobile device - if warning is showing, don't show welcome page
+  useEffect(() => {
+    const checkMobile = () => {
+      const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+                             (window.innerWidth <= 768 && 'ontouchstart' in window)
+      if (isMobileDevice) {
+        setShowWelcome(false)
+      }
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile)
+    }
+  }, [])
   const [pipeState, setPipeState] = useState<PipeState>({ phase: 'idle', targetIsUnderground: null })
   const pipeStateRef = useRef(pipeState)
   const stageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
