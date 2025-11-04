@@ -399,6 +399,24 @@ function App() {
   const selectedBrickRef = useRef<Brick | null>(null)
   const [showWelcome, setShowWelcome] = useState(true)
   const [gameStarted, setGameStarted] = useState(false)
+  
+  // Check if mobile device - if warning is showing, don't show welcome page
+  useEffect(() => {
+    const checkMobile = () => {
+      const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+                             (window.innerWidth <= 768 && 'ontouchstart' in window)
+      if (isMobileDevice) {
+        setShowWelcome(false)
+      }
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile)
+    }
+  }, [])
   const [pipeState, setPipeState] = useState<PipeState>({ phase: 'idle', targetIsUnderground: null })
   const pipeStateRef = useRef(pipeState)
   const stageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -595,9 +613,24 @@ function App() {
     })
   }, [])
 
+  const handleStartGame = useCallback(() => {
+    setShowWelcome(false)
+    setGameStarted(true)
+    // Clear any keys that might have been pressed before game started
+    setKeys(new Set())
+    keysRef.current = new Set()
+  }, [])
+
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // If welcome page is showing and Enter is pressed, start the game
+      if (showWelcome && (e.key === 'Enter' || e.key === 'Return')) {
+        e.preventDefault()
+        handleStartGame()
+        return
+      }
+      
       // Prevent default browser behavior for game keys (only when game started)
       if (GAME_KEYS.includes(e.key) && gameStarted) {
         e.preventDefault()
@@ -633,7 +666,7 @@ function App() {
       window.removeEventListener('keydown', handleKeyDown, true)
       window.removeEventListener('keyup', handleKeyUp, true)
     }
-  }, [gameStarted])
+  }, [gameStarted, showWelcome, handleStartGame])
 
   // Initialize and manage pure JavaScript physics engine
   useEffect(() => {
@@ -753,7 +786,7 @@ function App() {
       return newKeys
     })
   }, [])
-
+          
   // Memoize pipe position to prevent recreation on every render
   const pipePosition = useMemo(() => ({ x: gameConstants.PIPE_X, y: gameConstants.PIPE_Y }), [gameConstants])
 
