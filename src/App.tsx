@@ -574,21 +574,28 @@ function App() {
             const overlapBottom = PIPE_BOX.bottom - playerTop
             const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom)
 
+            // Only handle top collision when falling down onto pipe
             if (minOverlap === overlapTop && newVelocity.y > 0) {
               newVelocity.y = 0
               newPosition.y = PIPE_TOP_Y
               newIsJumping = false
-            } else if (minOverlap === overlapLeft) {
-              newVelocity.x = 0
-              newPosition.x = PIPE_BOX.left - PLAYER_WIDTH
-            } else if (minOverlap === overlapRight) {
-              newVelocity.x = 0
-              newPosition.x = PIPE_BOX.right
+            } 
+            // Only handle side collisions when player is actually inside the pipe (not on top)
+            // Check if player is below the top of the pipe before applying side collisions
+            else if (playerBottom > PIPE_BOX.top + 5) {
+              if (minOverlap === overlapLeft) {
+                newVelocity.x = 0
+                newPosition.x = PIPE_BOX.left - PLAYER_WIDTH
+              } else if (minOverlap === overlapRight) {
+                newVelocity.x = 0
+                newPosition.x = PIPE_BOX.right
+              }
             }
           }
 
-          // Snap player to pipe top if they're close and standing still
-          if (isOverPipeX && Math.abs(newPosition.y - PIPE_TOP_Y) < 20 && newVelocity.y === 0 && !newIsJumping) {
+          // Snap player to pipe top if they're close and standing still (but not when moving horizontally)
+          // Only snap when falling down or standing still, not when actively moving left/right
+          if (isOverPipeX && Math.abs(newPosition.y - PIPE_TOP_Y) < 20 && newVelocity.y === 0 && !newIsJumping && newVelocity.x === 0) {
             if (newPosition.y < PIPE_TOP_Y - 5) {
               newPosition.y = PIPE_TOP_Y
             }
