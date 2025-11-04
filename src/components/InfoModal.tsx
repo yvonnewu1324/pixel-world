@@ -125,6 +125,7 @@ function InfoModal({ brick, onClose }: InfoModalProps) {
                       return (
                         <div
                           key={lineIndex}
+                          className={brick.content.title === 'Experience' ? 'experience-line' : ''}
                           style={{
                             fontStyle: (line.includes('M.S.') || line.includes('B.S.')) ? 'italic' : 'normal',
                             display: 'flex',
@@ -140,8 +141,8 @@ function InfoModal({ brick, onClose }: InfoModalProps) {
                           {showStar && (
                             <span className="bullet-star"></span>
                           )}
-                          <span style={{ flex: rightText ? 1 : 'none', wordWrap: 'break-word', overflowWrap: 'break-word', minWidth: 0 }}>{mainText}</span>
-                          {rightText && <span style={{ flexShrink: 0, marginLeft: '10px', whiteSpace: 'nowrap' }}>{rightText}</span>}
+                          <span className="experience-main-text" style={{ flex: rightText ? 1 : 'none', wordWrap: 'break-word', overflowWrap: 'break-word', minWidth: 0 }}>{mainText}</span>
+                          {rightText && <span className="experience-right-text" style={{ flexShrink: 0, marginLeft: '10px', whiteSpace: 'nowrap' }}>{rightText}</span>}
                         </div>
                       );
                     })}
@@ -153,7 +154,8 @@ function InfoModal({ brick, onClose }: InfoModalProps) {
         </div>
 
         <div className="modal-footer">
-          <p className="hint">Press ESC or click outside to close</p>
+          <p className="hint desktop-hint">Press ESC or click outside to close</p>
+          <p className="hint mobile-hint">Tap outside or close button to exit</p>
         </div>
       </div>
     </div>

@@ -19,20 +19,8 @@ function MobileMessage() {
     }
   }, [])
 
-  if (!isMobile) {
-    return null
-  }
-
-  return (
-    <div className="mobile-message-overlay">
-      <div className="mobile-message-content">
-        <div className="laptop-icon">💻</div>
-        <h2>Large Screen Required</h2>
-        <p>This website is designed for larger screens such as laptops or desktop computers.</p>
-        <p className="hint">Please open this website on a device with a larger screen to play and explore my portfolio!</p>
-      </div>
-    </div>
-  )
+  // No longer blocking - just return null (or could show a helpful tip if needed)
+  return null
 }
 
 export default MobileMessage

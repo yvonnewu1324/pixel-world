@@ -18,6 +18,36 @@
   transform: scale(min(1, calc(100vw / 1400), calc((100vh - 40px) / 600)));
 }
 
+/* Mobile portrait canvas - fixed internal size, scale to fit screen */
+.game-canvas--mobile-portrait {
+  /* Fixed internal dimensions - game logic uses these coordinates */
+  width: 450px;
+  height: 900px;
+  /* Scale to fit viewport - adapts to different phone sizes */
+  /* Priority: fit width first, then adjust if height doesn't fit */
+  /* For small phones (375px): scale = 375/450 = 0.833 */
+  /* For larger phones: scale = 1 or smaller based on height */
+  transform: scale(min(1, calc(100vw / 450), calc((100vh - 120px) / 900))) translateZ(0);
+  transform-origin: top center;
+  margin: 0 auto;
+  border-width: 2px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+  /* Prevent layout shifts - critical for stability */
+  will-change: auto;
+  backface-visibility: hidden;
+  /* Create a stable stacking context */
+  isolation: isolate;
+}
+
+/* Mobile landscape orientation - still use desktop dimensions */
+@media (max-width: 1024px) and (orientation: landscape) {
+  .game-canvas:not(.game-canvas--mobile-portrait) {
+    /* For mobile landscape, fit width or height */
+    transform: scale(min(1, calc((100vw - 20px) / 1400), calc((100vh - 100px) / 600)));
+    margin: 10px auto;
+  }
+}
+
 
 .ground {
   position: absolute;
@@ -34,6 +64,14 @@
   );
   box-shadow: 0 -4px 0 #000;
   z-index: 45;
+  /* Prevent layout shift during animations */
+  will-change: auto;
+  transform: translateZ(0);
+}
+
+/* Mobile portrait: ground height is fixed (10% of 900px = 90px) */
+.game-canvas--mobile-portrait .ground {
+  height: 90px; /* Fixed: 10% of mobile canvas height (900px) */
 }
 
 .ground--underground {
@@ -67,4 +105,46 @@
 
 .instructions p {
   margin: 3px 0;
+}
+
+/* Show/hide instructions based on device */
+.desktop-instructions {
+  display: block;
+}
+
+.mobile-instructions {
+  display: none;
+}
+
+/* Mobile responsive instructions */
+@media (max-width: 768px) {
+  .instructions {
+    font-size: 8px;
+    top: 10px;
+    left: 10px;
+    padding: 8px;
+    line-height: 1.6;
+  }
+
+  .instructions p {
+    margin: 2px 0;
+  }
+
+  .desktop-instructions {
+    display: none;
+  }
+
+  .mobile-instructions {
+    display: block;
+  }
+}
+
+@media (max-width: 480px) {
+  .instructions {
+    font-size: 7px;
+    top: 8px;
+    left: 8px;
+    padding: 6px;
+    line-height: 1.5;
+  }
 }

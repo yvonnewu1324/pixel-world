@@ -6,14 +6,33 @@
 
 body {
   font-family: 'JetBrains Mono', 'Courier New', monospace;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden; /* Prevent scrollbars when content is centered */
   background: #2c2c2c;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 10px;
+  padding: 0;
+  /* Touch optimizations */
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+}
+
+
+/* Mobile portrait mode - align to top */
+@media (max-width: 768px) and (orientation: portrait) {
+  body {
+    align-items: flex-start;
+    padding: 0;
+    min-height: 100vh;
+  }
+}
+
+/* Allow text selection in modals */
+.modal-content,
+.modal-content * {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 #root {
@@ -23,4 +42,13 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: 100vh;
+}
+
+/* Mobile portrait mode - ensure root takes full height */
+@media (max-width: 768px) and (orientation: portrait) {
+  #root {
+    justify-content: flex-start;
+    min-height: 100vh;
+  }
 }

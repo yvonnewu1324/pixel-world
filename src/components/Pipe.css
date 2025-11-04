@@ -4,6 +4,10 @@
   pointer-events: none; /* Don't block player movement */
   width: 86px; /* Use game's internal coordinate system */
   height: 86px;
+  /* Prevent layout shift during animations */
+  will-change: auto;
+  transform: translateZ(0); /* GPU acceleration to prevent reflow */
+  backface-visibility: hidden; /* Prevent flickering */
 }
 
 .pipe-image {

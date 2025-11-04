@@ -4,9 +4,14 @@ import './Pipe.css'
 interface PipeProps {
   position: { x: number; y: number }
   isUnderground?: boolean
+  isMobilePortrait?: boolean
+  groundY?: number
+  canvasHeight?: number
 }
 
 function Pipe({ position, isUnderground = false }: PipeProps) {
+  // Always use top positioning for consistency with collision detection
+  // position.y is calculated to align pipe bottom with GROUND_Y for mobile
   return (
     <div 
       className={`pipe ${isUnderground ? 'pipe--underground' : ''}`}
