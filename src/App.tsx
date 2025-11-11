@@ -736,6 +736,23 @@ function App() {
     keysRef.current = new Set()
   }, [])
 
+  // Handle Enter key to start game
+  useEffect(() => {
+    if (!showWelcome) return
+
+    const handleEnterKey = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        handleStartGame()
+      }
+    }
+
+    window.addEventListener('keydown', handleEnterKey)
+    return () => {
+      window.removeEventListener('keydown', handleEnterKey)
+    }
+  }, [showWelcome, handleStartGame])
+
   // Handle virtual control touch events
   const handleVirtualKeyDown = useCallback((key: string) => {
     setKeys(prev => {
